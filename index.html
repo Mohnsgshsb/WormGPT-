@@ -20,18 +20,17 @@ body {
 }
 
 .container {
-  width: 350px;
+  width: 370px;
   padding: 30px;
   border-radius: 20px;
-  background: rgba(20, 0, 0, 0.9);
-  backdrop-filter: blur(10px);
+  background: rgba(20, 0, 0, 0.95);
   box-shadow: 0 0 30px rgba(255,0,0,0.4);
   text-align: center;
 }
 
 h2 {
   color: #ff1a1a;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 input {
@@ -42,7 +41,6 @@ input {
   border: none;
   background: #0d0d0d;
   color: white;
-  transition: 0.3s;
 }
 
 input:focus {
@@ -71,6 +69,7 @@ button:hover {
   color: #ff4d4d;
   font-size: 14px;
   display: none;
+  margin-top: 10px;
 }
 </style>
 </head>
@@ -82,15 +81,16 @@ button:hover {
 
   <input type="text" id="username" placeholder="اسم المستخدم">
   <input type="password" id="password" placeholder="كلمة المرور">
+  <input type="text" id="code" placeholder="كود الاشتراك">
 
   <button onclick="login()">دخول</button>
 
-  <div class="error" id="error">❌ بيانات غير صحيحة</div>
+  <div class="error" id="error"></div>
 </div>
 
 <script>
 
-// قاعدة البيانات (تعدل فيها براحتك)
+// 🔐 قاعدة البيانات (تعدل عليها)
 const users = [
   {
     username: "admin",
@@ -106,23 +106,27 @@ const users = [
   }
 ];
 
+// 🔑 تسجيل الدخول
 function login() {
   let user = document.getElementById("username").value;
   let pass = document.getElementById("password").value;
+  let code = document.getElementById("code").value;
   let today = new Date().toISOString().split('T')[0];
 
   let found = users.find(u => u.username === user && u.password === pass);
 
   if (!found) {
-    document.getElementById("error").innerText = "❌ بيانات غلط";
-    document.getElementById("error").style.display = "block";
+    showError("❌ بيانات غلط");
     return;
   }
 
-  // تحقق من الاشتراك
+  if (code !== found.code) {
+    showError("❌ كود الاشتراك غلط");
+    return;
+  }
+
   if (today > found.expire) {
-    document.getElementById("error").innerText = "⛔ الاشتراك انتهى";
-    document.getElementById("error").style.display = "block";
+    showError("⛔ الاشتراك انتهى");
     return;
   }
 
@@ -130,7 +134,14 @@ function login() {
   localStorage.setItem("user", user);
 
   // تحويل
-  window.location.href = "./gp.html";
+  window.location.href = "gp.html";
+}
+
+// 📛 عرض الخطأ
+function showError(msg) {
+  let err = document.getElementById("error");
+  err.innerText = msg;
+  err.style.display = "block";
 }
 
 </script>
